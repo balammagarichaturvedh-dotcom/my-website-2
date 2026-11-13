@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Proof-Carrying Data Analyst</title>
+  <style>
+    /* 1. Page Layout & Dark Theme */
+    body {
+      background: #0e1117;
+      color: #fafafa;
+      font-family: sans-serif;
+      max-width: 750px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.5;
+    }
+
+    h1 { margin-bottom: 5px; }
+    .subtitle { color: #9aa0a6; font-size: 14px; margin-bottom: 25px; }
+
+    /* 2. Boxes & Inputs */
+    .box {
+      border: 1px solid #262730;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .upload-area {
+      background: #262730;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      gap: 25px;
+      margin: 10px 0 20px;
+    }
+
+    input[type="checkbox"] { accent-color: #ff4b4b; }
+
+    select, textarea {
+      width: 100%;
+      background: #262730;
+      color: white;
+      border: 1px solid #3e424c;
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #262730;
+      color: white;
+      border: 1px solid #3e424c;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover, button.active {
+      border-color: #ff4b4b;
+      color: #ff4b4b;
+    }
+
+    .analyze-btn {
+      width: 100%;
+      padding: 12px;
+      background: #ff4b4b;
+      border: none;
+      font-weight: bold;
+    }
+
+    .analyze-btn:hover { color: white; opacity: 0.9; }
+
+    /* 3. Collapsible Sections & Spreadsheet Table */
+    details {
+      border: 1px solid #262730;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+
+    summary { cursor: pointer; font-weight: bold; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #262a35;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th { background: #191c24; color: #8b929e; }
+    td { cursor: cell; }
+
+    /* Spreadsheet Cell Highlight */
+    td.highlight {
+      outline: 2px solid #00c0f2;
+      background: rgba(0, 192, 242, 0.15);
+    }
+
+    /* 4. Answer Box */
+    #result {
+      display: none;
+      background: #161a24;
+      border: 1px solid #2b303c;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    pre {
+      background: #0e1117;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      color: #a3e4d7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <h1>🧾 Proof-Carrying Data Analyst</h1>
+  <p class="subtitle">Upload CSVs, PDFs, or graph images, ask a question in plain language, and review the result and generated code. Questions the data cannot answer are refused.</p>
+
+  <!-- STEP 1: DATA -->
+  <div class="box">
+    <h2>1. Add your data and documents</h2>
+    <p class="subtitle">Upload CSV tables, PDFs, or graph images.</p>
+    <div class="upload-area">
+      <input type="file" accept=".csv,.jpg,.pdf,.png,.webp">
+    </div>
+  </div>
+
+  <!-- CHECKBOXES -->
+  <small>Choose which predefined CSV files to include:</small>
+  <div class="checkbox-row">
+    <label><input type="checkbox" checked> Orders</label>
+    <label><input type="checkbox" checked> Users</label>
+    <label><input type="checkbox" checked> Inventory</label>
+  </div>
+
+  <!-- PREVIEW TABLES -->
+  <details open>
+    <summary>Preview loaded tables</summary>
+    
+    <div style="margin-top: 12px;">
+      <button class="tab active" onclick="showTable('orders', this)">orders.csv</button>
+      <button class="tab" onclick="showTable('users', this)">users.csv</button>
+      <button class="tab" onclick="showTable('inventory', this)">inventory.csv</button>
+    </div>
+
+    <!-- Orders Table -->
+    <table id="orders">
+      <tr><th>order_id</th><th>user_id</th><th>amount</th><th>status</th></tr>
+      <tr><td>ORD-1001</td><td>USR-401</td><td>$129.50</td><td>Delivered</td></tr>
+      <tr><td>ORD-1002</td><td>USR-882</td><td>$44.00</td><td>Shipped</td></tr>
+      <tr><td>ORD-1003</td><td>USR-119</td><td>$312.20</td><td>Processing</td></tr>
+      <tr><td>ORD-1004</td><td>USR-204</td><td>$510.00</td><td>Cancelled</td></tr>
+    </table>
+
+    <!-- Users Table -->
+    <table id="users" style="display:none;">
+      <tr><th>user_id</th><th>name</th><th>plan</th></tr>
+      <tr><td>USR-401</td><td>Sarah Jenkins</td><td>Enterprise</td></tr>
+      <tr><td>USR-882</td><td>Devon Miles</td><td>Starter</td></tr>
+      <tr><td>USR-119</td><td>Priya Patel</td><td>Pro</td></tr>
+      <tr><td>USR-204</td><td>Alex Rivera</td><td>Pro</td></tr>
+    </table>
+
+    <!-- Inventory Table -->
+    <table id="inventory" style="display:none;">
+      <tr><th>item_sku</th><th>product_name</th><th>quantity</th></tr>
+      <tr><td>SKU-A01</td><td>Wireless Mouse</td><td>142</td></tr>
+      <tr><td>SKU-B09</td><td>Mechanical Keyboard</td><td>18</td></tr>
+      <tr><td>SKU-C14</td><td>27" 4K Monitor</td><td>5</td></tr>
+    </table>
+  </details>
+
+  <!-- SCHEMA -->
+  <details>
+    <summary>Schema context sent to the model</summary>
+    <pre>orders (order_id, user_id, amount, status)
+users (user_id, name, plan)
+inventory (item_sku, product_name, quantity)</pre>
+  </details>
+
+  <!-- STEP 2: QUESTION -->
+  <h2>2. Ask a question</h2>
+
+  <label>Start with an example (optional)</label>
+  <select onchange="document.getElementById('question').value = this.value">
+    <option value="">(choose an example)</option>
+    <option value="How many unique orders are there?">How many unique orders are there?</option>
+    <option value="Which items are low in inventory?">Which items are low in inventory?</option>
+    <option value="What is the weather today?">What is the weather today? (Refusal test)</option>
+  </select>
+
+  <label>Your question</label>
+  <textarea id="question" rows="3" placeholder="For example: How many unique orders are there?"></textarea>
+
+  <button class="analyze-btn" onclick="analyze()">3. Analyze data</button>
+
+  <!-- RESULT OUTPUT -->
+  <div id="result"></div>
+
+  <!-- SIMPLE JAVASCRIPT -->
+  <script>
+    // 1. Switch between sample tables
+    function showTable(tableId, clickedBtn) {
+      document.querySelectorAll('table').forEach(t => t.style.display = 'none');
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(tableId).style.display = 'table';
+      clickedBtn.classList.add('active');
+    }
+
+    // 2. Highlight any clicked table cell
+    document.querySelectorAll('td').forEach(cell => {
+      cell.onclick = function() {
+        document.querySelectorAll('td').forEach(c => c.classList.remove('highlight'));
+        this.classList.add('highlight');
+      };
+    });
+
+    // 3. Show answer & proof code
+    function analyze() {
+      const q = document.getElementById('question').value.toLowerCase();
+      const resultBox = document.getElementById('result');
+      resultBox.style.display = 'block';
+
+      if (q.includes('order')) {
+        resultBox.innerHTML = `
+          <p style="color:#21c354;"><strong>✓ Verified Answer:</strong> There are 4 unique orders in orders.csv.</p>
+          <pre>df = pd.read_csv('orders.csv')\nprint(df['order_id'].nunique()) # Output: 4</pre>`;
+      } 
+      else if (q.includes('inventory')) {
+        resultBox.innerHTML = `
+          <p style="color:#21c354;"><strong>✓ Verified Answer:</strong> 2 items are low in stock: Mechanical Keyboard (18) and 27" 4K Monitor (5).</p>
+          <pre>df = pd.read_csv('inventory.csv')\nprint(df[df['quantity'] < 20])</pre>`;
+      } 
+      else {
+        resultBox.innerHTML = `
+          <p style="color:#ff4b4b;"><strong>✕ Refused:</strong> The loaded tables do not have enough data to answer this question.</p>`;
+      }
+    }
+  </script>
+
+</body>
+</html>
